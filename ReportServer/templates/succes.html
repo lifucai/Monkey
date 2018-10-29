@@ -1,0 +1,22 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Monkey测试</title>
+    </head>
+    <body>
+        <h1>测试包上传成功！！！</h1>
+        <form method="post" action="/monkeyRun" enctype="multipart/form-data">
+             <div><span style="color:red">*</span>&nbsp;&nbsp;测试APP的包名:<input  type="text" name="apkpackagename"></div><br/>
+             <div><span style="color:red">*</span>&nbsp;&nbsp;测试时长(小于60分钟):<input  type="text" name="runtime"></div><br/>
+             <div><span style="color:red">*</span>&nbsp;&nbsp;环境:<input  type="text" name="env"></div><br/>
+             <div><span style="color:red">*</span>&nbsp;&nbsp;seed值(必须整数，如200):<input  type="text" name="seed"></div><br/>
+             <div><span style="color:red">*</span>&nbsp;&nbsp;Monkey事件次数(必须整数,如10000):<input  type="text" name="eventcount"></div><br/>
+             <div>throttle值(必须整数，如300):<input  type="text" name="throttle"></div><br/>
+             <div>白名单(多个用英文','分隔):<input  type="text" name="whitelist"></div><br/>
+             <div>黑名单(多个用英文','分隔):<input  type="text" name="blacklist"></div><br/>
+             <div>日志级别(INFO,WARNING,ERROR,DEBUG,默认INFO):<input  type="text" name="loglevel"></div><br/>
+             <div><input  type="submit" value="开始Monkey测试"></div><br/>
+        </form>
+    </body>
+</html>
