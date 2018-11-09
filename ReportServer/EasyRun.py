@@ -66,7 +66,7 @@ def run(apkpackagename,runtime,seed,throttle,whitelist,blacklist,env,eventcount,
     #事件次数
     loglevel = loglevel
     if loglevel == '':
-        loglevel = "INFO"
+        loglevel="INFO"
     # 日志等级
 
     adc = AdbCommon(devices)
@@ -227,13 +227,21 @@ def main(**kwargs):
 
     adc.sendbroadcast(1)
     # 关闭隐藏导航
-
-    if bsm.writeerror(monkeylog, writeerror) == 0:
+    result =bsm.writeerror(monkeylog, writeerror)
+    if result[0] == 0:
+        crashnum = result[1]
+        anrnumber = result[2]
+        noresponsenum = result[3]
+        exceptionnum = result[4]
         # 获取monkeylog所有日志send_mail(devices,monkeylog, writeerror,str(difftime),monkeycmd)
-        send_mail_error(devices ,monkeylog, writeerror,str(difftime),monkeycmd)
+        send_mail_error(devices ,monkeylog, writeerror,str(difftime),monkeycmd,crashnum,anrnumber,noresponsenum,exceptionnum)
         # 发送报警邮件
     else:
-        send_mail_info(devices,monkeylog, str(difftime), monkeycmd)
+        crashnum = result[1]
+        anrnumber = result[2]
+        noresponsenum = result[3]
+        exceptionnum = result[4]
+        send_mail_info(devices,monkeylog, str(difftime), monkeycmd,crashnum,anrnumber,noresponsenum,exceptionnum)
 
 
 

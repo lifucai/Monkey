@@ -216,10 +216,11 @@ class AdbCommon():
         '''
         try:
             if self.inspectapp(apkpackagename) == 0:
+                #logger.log_info('app已经存在,准备卸载')
                 cmd1 = 'adb -s %s uninstall %s' % (self.dev,apkpackagename)
                 logger.log_debug(cmd1)
                 os.system(cmd1)
-
+                logger.log_info('卸载完成，重新安装')
                 cmd2 = 'adb -s %s install %s' % (self.dev,apkpath)
                 logger.log_debug(cmd2)
                 os.system(cmd2)
@@ -230,6 +231,7 @@ class AdbCommon():
                 else:
                     return 1
             else:
+                #logger.log_info('app不存在，准备安装')
                 cmd3 = 'adb -s %s install %s' % (self.dev, apkpath)
                 logger.log_debug(cmd3)
                 os.system(cmd3)
@@ -251,6 +253,7 @@ class AdbCommon():
         :return:
         '''
         if self.dev != 0:
+            #logger.log_info('打开app:' % apkpackagename)
             cmd = "adb -s %s shell am start -n %s/%s" % (self.dev, apkpackagename, activity)
             logger.log_info(cmd)
             os.system(cmd)

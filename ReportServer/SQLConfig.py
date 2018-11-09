@@ -6,9 +6,9 @@
 
 localhost = '127.0.0.1'
 user = 'root'
-pwd = '123456xxx'
+pwd = '123456'
 port = 3306
-db = 'xxx'
-tablename = 'xxxx'
+db = 'test_django'
+tablename = 'android_monkey'
 
 

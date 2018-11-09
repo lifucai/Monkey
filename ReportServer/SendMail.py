@@ -29,7 +29,7 @@ def file_name(file_dir):
                 L.append(os.path.join(root, file))
     return L
 
-def _joincontent(Runtime, mobilebrand, mobilesysversion, cmd, writerror):
+def _joincontenterror(Runtime, mobilebrand, mobilesysversion, cmd, writerror,crashnum,anrnumber,noresponsenum,exceptionnum):
     '''
     拼接邮件中content内容
     :return:
@@ -43,35 +43,39 @@ def _joincontent(Runtime, mobilebrand, mobilesysversion, cmd, writerror):
         sendtime = time.strftime("%Y-%m-%d %H:%M:%S")
         # 定义发生时间
         content = ''' 
-发生时间: %s 
 
-测试时长: %s秒
+Monkey测试时长: %s秒
 
-设备型号: %s
+Monkey测试设备型号: %s
 
-设备系统: %s
+Monkey测试设备系统版本: %s
 
-测试APP: %s
+Monkey测试APP: %s
 
-monkey执行命令：%s
+Monkey执行命令：%s
+
+Crash错误数：%s       ANR错误数：%s       No Response错误数：%s      Exception错误数：%s
 
 错误日志标记: %s
 
 monkey日志详见附件
 
     ''' % \
-                  (sendtime,
-                   Runtime,
+                  (Runtime,
                    mobilebrand,
                    mobilesysversion,
                    ''.join(file_name(apkdir)).split('/')[-1],
                    cmd,
+                   crashnum,
+                   anrnumber,
+                   noresponsenum,
+                   exceptionnum,
                    '\n' + error)
         return content
     except Exception as e:
         logger.log_error('拼接邮件中content失败: ' + str(e))
         return ''
-def _joincontentinfo(Runtime, mobilebrand, mobilesysversion,  cmd):
+def _joincontentinfo(Runtime, mobilebrand, mobilesysversion,  cmd,crashnum,anrnumber,noresponsenum,exceptionnum):
     '''
     拼接邮件中content内容
     :return:
@@ -82,28 +86,31 @@ def _joincontentinfo(Runtime, mobilebrand, mobilesysversion,  cmd):
         sendtime = time.strftime("%Y-%m-%d %H:%M:%S")
         # 定义发生时间
         content = ''' 
-发生时间: %s 
 
-测试时长: %s秒
+Monkey测试时长: %s秒
 
-设备型号: %s
+Monkey测试设备型号: %s
 
-设备系统: %s
+Monkey测试设备系统版本: %s
 
-测试APP: %s
+Monkey测试APP: %s
 
-monkey执行命令：%s
+Monkey执行命令：%s
 
+Crash错误数：%s       ANR错误数：%s       No Response错误数：%s      Exception错误数：%s
 
 monkey日志详见附件
 
     ''' % \
-                  (sendtime,
-                   Runtime,
+                  (Runtime,
                    mobilebrand,
                    mobilesysversion,
                    ''.join(file_name(apkdir)).split('/')[-1],
-                   cmd)
+                   cmd,
+                   crashnum,
+                   anrnumber,
+                   noresponsenum,
+                   exceptionnum)
         return content
     except Exception as e:
         logger.log_error('拼接邮件中content失败: ' + str(e))
@@ -119,7 +126,7 @@ def _format_addr(s):
     return formataddr(( \
         Header(name, 'utf-8').encode(), \
         addr.encode('utf-8') if isinstance(addr, unicode) else addr))
-def send_mail_error(devices,monkeylog, writerror ,runtime,monkeycmd):
+def send_mail_error(devices,monkeylog, writerror ,runtime,monkeycmd,crashnum,anrnumber,noresponsenum,exceptionnum):
     """
     邮件发送
     params:
@@ -143,8 +150,8 @@ def send_mail_error(devices,monkeylog, writerror ,runtime,monkeycmd):
 
     adc = AdbCommon(devices)
 
-    content = _joincontent(runtime, adc.getmobilebrand(), adc.getmobileversion(),
-                           stringwrap(monkeycmd), writerror)
+    content = _joincontenterror(runtime, adc.getmobilebrand(), adc.getmobileversion(),
+                           stringwrap(monkeycmd), writerror,crashnum,anrnumber,noresponsenum,exceptionnum)
     # 邮件正文
 
     if content != '':
@@ -160,7 +167,7 @@ def send_mail_error(devices,monkeylog, writerror ,runtime,monkeycmd):
         message['From'] = _format_addr(u'发件人<%s>' % mail_user)
         message['To'] = ";".join(receivers)
 
-        subject = 'AndroidMonkey测试反馈'
+        subject = 'AndroidMonkey测试结果反馈'
 
         message['Subject'] = Header(subject, 'utf-8')
 
@@ -196,7 +203,7 @@ def send_mail_error(devices,monkeylog, writerror ,runtime,monkeycmd):
             s.quit()
     else:
         logger.log_info('未达到报警状态')
-def send_mail_info(devices,monkeylog, runtime, monkeycmd):
+def send_mail_info(devices,monkeylog, runtime, monkeycmd,crashnum,anrnumber,noresponsenum,exceptionnum):
     """
     邮件发送
     params:
@@ -221,7 +228,7 @@ def send_mail_info(devices,monkeylog, runtime, monkeycmd):
     adc = AdbCommon(devices)
 
     content = _joincontentinfo(runtime, adc.getmobilebrand(), adc.getmobileversion(),
-                                stringwrap(monkeycmd))
+                                stringwrap(monkeycmd),crashnum,anrnumber,noresponsenum,exceptionnum)
     # 邮件正文
 
     if content != '':
@@ -237,7 +244,7 @@ def send_mail_info(devices,monkeylog, runtime, monkeycmd):
         message['From'] = _format_addr(u'发件人<%s>' % mail_user)
         message['To'] = ";".join(receivers)
 
-        subject = 'AndroidMonkey测试反馈'
+        subject = 'AndroidMonkey测试结果反馈'
 
         message['Subject'] = Header(subject, 'utf-8')
 

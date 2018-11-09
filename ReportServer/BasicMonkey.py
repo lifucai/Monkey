@@ -20,21 +20,20 @@ from DateBean import DateBean
 
 quotiety = int(62500 / 60)
 # 事件和时间的系数
-
+flipjavaIOException = 'flipjava.io.IOException'
 CRASH = 'CRASH'
 ANR = 'ANR'
 anr = 'anr'
 Exception= 'Exception'
 NoResponse = 'No Response'
-Monkeyfinished = '// Monkey finished'
 NullPointer="java.lang.NullPointerException"
 IllegalState="java.lang.IllegalStateException"
 IllegalArgument="java.lang.IllegalArgumentException"
 ArrayIndexOutOfBounds="java.lang.ArrayIndexOutOfBoundsException"
 RuntimeException="java.lang.RuntimeException"
 SecurityException="java.lang.SecurityException"
-IncludeCategory="android.intent.category.MONKEY"
 Monkey_Finish='Monkey finished'
+IncludeCategory='IncludeCategory'
 # 过滤Monkey关键字
 
 key = []
@@ -55,17 +54,12 @@ class BasicMonkey():
         self.db = DateBean()
 
     def init_runmonkey(self, packagename,env):
-        # 启动app
-        self.adc.launch_app(packagename, packagename + '.ui.SplashScreenActivity')
         # 引导页升级提示关闭坐标
         x_upgrade = 950
-        y_upgrade = 680
-        self.adc.click_ele(x_upgrade, y_upgrade)
+        y_upgrade = 700
         # 引导页登录按钮坐标
         x_login = 300
         y_login = 1400
-        # 点击引导页登录
-        self.adc.click_ele(x_login, y_login)
         # 账号坐标
         x_login_account = 400
         y_login_account = 580
@@ -87,10 +81,23 @@ class BasicMonkey():
         # 关闭广告坐标
         x_adv_btn = 980
         y_adv_btn = 480
+        # 首页登录坐标
+        x_firstpage_btn = 800
+        y_firstpage_btn = 1650
+        # 启动app
+        self.adc.launch_app(packagename, packagename + '.ui.SplashScreenActivity')
+        #点击升级关闭按钮
+        self.adc.click_ele(x_upgrade, y_upgrade)
+        #点击立即体验
+        self.adc.click_ele(x_exp_btn, y_exp_btn)
+        # 点击关闭广告
+        #self.adc.click_ele(x_login, y_login)
+        # 点击首页登录按钮
+        self.adc.click_ele(x_firstpage_btn, y_firstpage_btn)
         if env == 'test':
             # 点击账号坐标
-            test_accont = 'XXXX'
-            test_pwd = 'XXXX'
+            test_accont = 'smart040'
+            test_pwd = 'Qq123123'
             self.adc.click_ele(x_login_account, y_login_account)
             self.adc.input_text(test_accont)
             self.adc.click_ele(x_login_pwd, y_login_pwd)
@@ -98,8 +105,8 @@ class BasicMonkey():
             self.adc.click_ele(x_login_btn, y_login_btn)
         if env == 'demo':
             # 点击账号坐标
-            demo_accont = 'XXX'
-            demo_pwd = 'XXXX'
+            demo_accont = 'lifucai'
+            demo_pwd = 'Qq123123'
             self.adc.click_ele(x_login_account, y_login_account)
             self.adc.input_text(demo_accont)
             self.adc.click_ele(x_login_pwd, y_login_pwd)
@@ -175,7 +182,7 @@ class BasicMonkey():
         :return: 0表示未结束,1表示结束
         '''
         with open(monkeylog) as f:
-            if Monkeyfinished in f.read():
+            if Monkey_Finish in f.read():
                 return 1
             else:
                 return 0
@@ -260,30 +267,57 @@ class BasicMonkey():
         '''
         f = open(logcatpath, "r")
         lines = f.readlines()
+        logger.log_info("日志总行数:%s" % lines)
         if len(lines) == 0:
             logger.log_info("扫描%s路径的log日志为空,将删除" % logcatpath)
             os.system('rm -rf %s' % logcatpath)
         else:
             if not os.path.exists(self.db.logdir):
                 os.mkdir(self.db.logdir)
-            fr = open(wirteerrorpath, "a")
-            for line in lines:
-                if (re.findall(CRASH, line) or
-                        re.findall(ANR, line) or
-                        re.findall(NoResponse, line)):
-                    #re.findall(IncludeCategory, line)
-                    number = lines.index(line)  # 找到行数
-                    fr.write("第%s行" % number + ' , ' +"错误原因:%s" % line)
-                    fr.write("\n")
-            f.close()
-            fr.close()
+            else:
+                fr = open(wirteerrorpath, "a")
+                crashnum = 0
+                anrnumber = 0
+                #catenum = 0
+                noresponsenum = 0
+                exceptionnum = 0
+                number = 1
+                for line in lines:
+                    if (re.findall(CRASH, line)):
+                        crashnum += 1
+                        fr.write("第%s行" % number + ' , ' + "错误原因:%s" % line)
+                        fr.write("\n")
+                    if (re.findall(ANR, line)):
+                        anrnumber += 1
+                        fr.write("第%s行" % number + ' , ' + "错误原因:%s" % line)
+                        fr.write("\n")
+                    if (re.findall(anr, line)):
+                        anrnumber += 1
+                        fr.write("第%s行" % number + ' , ' + "错误原因:%s" % line)
+                        fr.write("\n")
+                    if (re.findall(NoResponse, line)):
+                        noresponsenum += 1
+                        fr.write("第%s行" % number + ' , ' + "错误原因:%s" % line)
+                        fr.write("\n")
+                    if (re.findall(Exception, line)):
+                        if (re.findall(flipjavaIOException, line)):
+                            pass
+                        else:
+                            exceptionnum += 1
+                            fr.write("第%s行" % number + ' , ' + "错误原因:%s" % line)
+                            fr.write("\n")
+                    number += 1
+                #print crashnum, anrnumber, noresponsenum, exceptionnum
+                f.close()
+                fr.close()
             if os.path.getsize(wirteerrorpath)  == 0:
                 logger.log_info("扫描%s路径的log日志中未发现错误日志" % logcatpath)
                 os.system('rm -rf %s' % wirteerrorpath)
-                return 1
+                return 1,crashnum,anrnumber,noresponsenum,exceptionnum
             else:
                 logger.log_info("扫描%s路径的log日志中发现错误日志,过滤后的文件路径%s" % (logcatpath,wirteerrorpath))
-                return 0
+                return 0,crashnum,anrnumber,noresponsenum,exceptionnum
+
 
 
     def returnmonkey(self,activity):

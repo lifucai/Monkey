@@ -84,15 +84,15 @@ def runMonkey():
     runtime = str(request.form.get('runtime'))
     env = str(request.form.get('env'))
     seed = str(request.form.get('seed'))
+    eventcount = str(request.form.get('eventcount'))
     #monkey出现bug很难复现，如果传入相同的seed，他们运行的序列一样，可以用来复现bug
-    throttle = str(request.form.get('throttle'))
-    if throttle == '':
-        throttle = 0
+    throttle = request.form.get('throttle')
+    if throttle=='':
+        throttle=0
     #可以使用这个设置来减缓Monkey的运行速度，不设置的话，则事件之间将没有延迟
     whitelist = str(request.form.get('whitelist'))
     blacklist = str(request.form.get('blacklist'))
-    eventcount = str(request.form.get('eventcount'))
-    loglevel = str(request.form.get('loglevel'))
+    loglevel = request.form.get('loglevel')
     result = EasyRun.run(apkpackagename,runtime,seed,throttle,whitelist,blacklist,env,eventcount,loglevel)
     if result == 0:
         return render_template('runsucces.html')

@@ -4,8 +4,8 @@
 mail_host = "smtp.partner.outlook.cn"
 mail_port=25
 #mail_pass = "xxxxxx"
-mail_user = "xxxx"
-mail_pass = "xxxxx"
+mail_user = "xxxxxx"
+mail_pass = "xxx"
 mail_postfix = "xxxx"
 debuglist = ['xxxx']
-receiverslist = ['xxxx','xxxxx']
+receiverslist = ['xxxx']
